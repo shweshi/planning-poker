@@ -5,7 +5,7 @@
  */
 
 // Getting HTTP_PORT from environment or using 8080 if not set.
-HTTP_PORT = process.env.HTTP_PORT || 8080;
+HTTP_PORT = process.env.PORT || 8080;
 
 // Starting a simple WebSocket broadcast server.
 var WebSocketServer = require("ws").Server; // webSocket library
