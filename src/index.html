@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html style="font-size: 62.5%">
+
+<head>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="apple-touch-icon" href="favicon_96x96.png">
+  <meta name="theme-color" content="#db4938" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planning poker</title>
+</head>
+
+<body>
+  <script src="https://unpkg.com/vue@next" defer></script>
+  <script src="assets/clipboard.min.js" defer></script>
+  <script src="app.js" defer></script>
+
+
+  <div v-cloak class="app__main-layout" id="app">
+    <div class="app__navbar">
+      <div class="app__navbar_left"></div>
+      <div class="app__navbar_center">
+        <h1 @click="onRename()">{{ playerName }}</h1>
+      </div>
+      <div class="app__navbar_right"></div>
+    </div>
+    <div class="bg-wrap"></div>
+    <div class="app__play-table">
+      <div>&nbsp;</div>
+      <div class="app__play-table_top-cards">
+        <div class="app__table-card_layout" v-for="(card, index) in cards" :class="{'hidden': index % 2}">
+          <div :class="
+                { 
+                    'app__table-card_back': card.vote && !isCardsOpen, 
+                    'app__table-card_face': card.vote === null || isCardsOpen,
+                    'app__table-card_open': card.vote && isCardsOpen
+                }">
+            <span v-if="isCardsOpen && card.vote">{{ card.vote }}</span>
+          </div>
+          <div class="app__table-card_player-name" :title="card.playerName">
+            {{ card.playerName }}
+          </div>
+        </div>
+      </div>
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      <div class="app__play-table_table">
+        <button v-if="!isCardsOpen && !openDelayCounter" class="app__play-table_table-button" @click="onRevealCards()">
+          Reveal Cards
+        </button>
+
+        <label v-if="!isCardsOpen && openDelayCounter" class="">
+          <button class="app__play-table_table-button">
+            {{ openDelayCounter }}
+          </button>
+        </label>
+        <button v-if="isCardsOpen" class="app__play-table_table-button" @click="onStartNewVoting()">
+          Start new voting
+        </button>
+
+      </div>
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      <div class="app__play-table_bottom-cards">
+        <div class="app__table-card_layout" v-for="(card, index) in cards" :class="{'hidden': index % 2 == 0}">
+          <div :class="
+            { 
+                'app__table-card_back': card.vote && !isCardsOpen, 
+                'app__table-card_face': card.vote === null || isCardsOpen,
+                'app__table-card_open': card.vote && isCardsOpen
+            }">
+            <span v-if="isCardsOpen && card.vote">{{ card.vote }}</span>
+          </div>
+          <div class="app__table-card_player-name">{{ card.playerName }}</div>
+        </div>
+      </div>
+      <div>&nbsp;</div>
+    </div>
+    <div v-if="isCardsOpen" class="app__avr-score">
+      <div style="padding: 3rem">Average: {{ averageScore }}</div>
+    </div>
+
+    <div v-if="!isCardsOpen" class="app__cards-selector">
+      <ul class="app__cards-selector_list">
+        <li class="app__player-card" v-for="variant in variants">
+          <button class="app__player-card_button" translate="no" @click="onVote(variant)"
+            :class="{ 'app__player-card_button_selected': variant === vote }">
+            <span><b>{{ variant }}</b></span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="footer">
+      <div id="w-node-_929856f4-186b-0d5d-c112-8706c7fc7e39-b49f6aaf" class="circuit-anim-wrap">
+        <div
+          style="opacity: 1; transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;"
+          class="main-chip-wrap">
+          <div class="chip-connector chip-connector--main cc-right" style="text-align: center">
+            <p><a href="https://github.com/shweshi/planning-poker" style="color: white">GitHub</a></p>
+            <span>v1.0.0</span>
+          </div>
+        </div>
+        <div class="circuit-img-wrap"><img
+            src="https://uploads-ssl.webflow.com/63281d362a9501fa6e9f6aae/6332c9638f3a69b1f5912d94_circuit.png"
+            loading="lazy" width="451" height="326" class="circuit-img">
+          <div
+            style="transform: translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d; opacity: 1;"
+            class="circuit-img-anim-circle"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
