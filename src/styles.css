@@ -29,6 +29,8 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 }
 
 .app__play-table {
+  padding-top: 5rem;
+  padding-top: 5rem;
   display: grid;
   grid-template-areas:
     "left top right"
@@ -57,6 +59,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 }
 
 .app__cards-selector {
+  padding-top: 8rem;
   height: 128px;
 }
 
@@ -131,7 +134,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 }
 
 .app__play-table_bottom-cards {
-  padding-top: 1.6rem;
+  padding-top: 5rem;
 }
 
 .app__play-table_table-button {
@@ -309,6 +312,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 }
 
 .app__avr-score {
+  padding-top: 5rem;
   height: 128px;
   text-align: center;
   font-size: 3rem;
