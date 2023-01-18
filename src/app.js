@@ -33,19 +33,43 @@
    * @returns List of variants.
    */
   function randomVariants() {
-    let variants = [];
-    const ranges = [1, 2, 3, 5, 8, 13, 21, 34, 55];
-    // const zip = (rows) => rows[0].map((_, c) => rows.map((row) => row[c]));
-    // const randomInt = (lowerBound, upperBound) =>
-    //   Math.ceil(Math.random() * (upperBound - lowerBound) + lowerBound);
-    // bounds = zip([ranges.slice(1), ranges]);
-    // let lb, ub;
-    // for (let bound of bounds) {
-    //   [ub, lb] = bound;
-    //   variants.push(randomInt(ub, lb));
-    // }
+    return [1, 2, 3, 5, 8, 13, 21, 34, 55];
+  }
 
-    return ranges;
+  function fireConfetti() {
+    var number = 200;
+    var defaults = {
+      origin: { y: 0.7 }
+    };
+
+    function fire(particleRatio, opts) {
+      confetti(Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(number * particleRatio)
+      }));
+    }
+
+    fire(0.25, {
+      spread: 26,
+      startVelocity: 55,
+    });
+    fire(0.2, {
+      spread: 60,
+    });
+    fire(0.35, {
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.8
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      scalar: 1.2
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 45,
+    });
   }
 
   const App = {
@@ -60,6 +84,7 @@
         variants: [...randomVariants(), "?"],
         vote: null,
         averageScore: 0,
+        consensus: 0
       };
     },
     mounted() {
@@ -192,8 +217,13 @@
 
               if (this.openDelayCounter <= 0) {
                 this.isCardsOpen = true;
-                this.averageScore = this.calcAverageScore();
+                const { averageScore, consensus } = this.calcAverageScore();
+                this.averageScore = averageScore;
+                this.consensus = consensus;
 
+                if (consensus) {
+                  fireConfetti();
+                }
                 // Update the voting results and calculate average.
                 // `setTimeout` is required to wait for `v-if` is ready.
                 setTimeout(() => {
@@ -209,6 +239,7 @@
 
                       content += `\n`;
                       content += `Average: ${this.averageScore}`;
+
                       return content;
                     },
                   });
@@ -296,6 +327,8 @@
       calcAverageScore() {
         let score = 0;
         let count = 0;
+        let consensus = this.cards.every((val, i, arr) => val.vote === arr[0].vote);
+
         for (let idx in this.cards) {
           if (typeof this.cards[idx].vote === "number") {
             score += this.cards[idx].vote;
@@ -303,7 +336,13 @@
           }
         }
 
-        return Math.round(count ? score / count : 0, 1);
+        if (!consensus && score > 0) {
+          consensus = false;
+        } else if (consensus && score > 0) {
+          consensus = true;
+        }
+
+        return { averageScore: Math.round(count ? score / count : 0, 1), consensus };
       },
     },
   };
