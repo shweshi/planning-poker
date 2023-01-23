@@ -106,6 +106,7 @@
           playerName = newName;
         }
         localStorage.setItem("playerName", playerName);
+        generateAvatar();
       }
       this.playerName = playerName;
 
