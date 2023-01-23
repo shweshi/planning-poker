@@ -259,7 +259,7 @@ body {
   text-align: center;
   display: flex;
   flex-direction: row;
-  padding-top: 10px;
+  padding-top: 00px;
   width: 100%;
   max-width: 1370px;
   margin-right: auto;
@@ -274,7 +274,6 @@ body {
 .app__navbar_left,
 .app__navbar_right {
   width: 16rem;
-  display: flex;
 }
 
 .app__navbar_center {
