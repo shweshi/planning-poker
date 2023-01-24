@@ -17,7 +17,7 @@
   <meta property="og:title" content="Planning Poker | Scrum Planning">
   <meta property="og:description" content="Planning poker is an online app to get consensus-based estimation.">
   <meta property="og:image"
-    content="https://metatags.io/assets/meta-tags-16a33a6a8531e519cc0936fbba0ad904e52d35f34a46c97a2c9f6f7dd7d336f2.png">
+    content="">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
@@ -25,7 +25,7 @@
   <meta property="twitter:title" content="Planning Poker | Scrum Planning">
   <meta property="twitter:description" content="Planning poker is an online app to get consensus-based estimation.">
   <meta property="twitter:image"
-    content="https://metatags.io/assets/meta-tags-16a33a6a8531e519cc0936fbba0ad904e52d35f34a46c97a2c9f6f7dd7d336f2.png">
+    content="">
 </head>
 
 <body>
@@ -36,9 +36,14 @@
   <div v-cloak class="app__main-layout" id="app">
     <div class="app__navbar">
       <div class="app__navbar_left">
-        <h1 class="glowing cursor-pointer"><span class="logo-text">P</span>lanning Poker</h1>
+        <h1 class="glowing cursor-pointer" id="glowing-logo-text"><span class="logo-text" id="logo-text">P</span>lanning
+          Poker</h1>
       </div>
       <div class="app__navbar_center">
+        <label for="role-switch" class="role-switch">
+          <input type="checkbox" id="role-switch" @input="onRoleChange($event)" :checked="playerRole == 'Moderator'">
+          <span></span>
+        </label>
       </div>
       <div class="app__navbar_right text-right cursor-pointer">
         <h2 @click="onRename()">
@@ -67,7 +72,8 @@
       <div>&nbsp;</div>
       <div>&nbsp;</div>
       <div class="app__play-table_table">
-        <button v-if="!isCardsOpen && !openDelayCounter" class="app__play-table_table-button" @click="onRevealCards()">
+        <button v-if="!isCardsOpen && !openDelayCounter" class="app__play-table_table-button pulse pulse-blue"
+          @click="onRevealCards()" :disabled="playerRole == 'Participant'">
           Reveal cards
         </button>
 
@@ -76,7 +82,8 @@
             {{ openDelayCounter }}
           </button>
         </label>
-        <button v-if="isCardsOpen" class="app__play-table_table-button pulse pulse-blue" @click="onStartNewVoting()">
+        <button v-if="isCardsOpen" class="app__play-table_table-button pulse pulse-blue" @click="onStartNewVoting()"
+          :disabled="playerRole == 'Participant'">
           Start new voting
         </button>
       </div>
@@ -115,68 +122,6 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <script>
-    function generateAvatar() {
-      const text = localStorage.getItem("playerName").match(/(\b\S)?/g).join("").match(/(^\S|\S$)?/g).join("").toUpperCase();
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-
-      foregroundColor = "#ffffff";
-      backgroundColor = "#dc851c";
-
-      canvas.width = 200;
-      canvas.height = 200;
-
-      // Draw background
-      context.fillStyle = backgroundColor;
-      context.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw text
-      context.font = "bold 120px Roboto";
-      context.fillStyle = foregroundColor;
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      context.fillText(text, canvas.width / 2, canvas.height / 2);
-
-      document.getElementById("avatar").src = canvas.toDataURL("image/png");
-    };
-
-    generateAvatar();
-
-    var doms = document.getElementsByClassName("glowy-blob");
-
-    var selected = 0;
-
-    for (var x = 0; x < doms.length; x++) {
-      for (var i = 0; i < doms[x].children.length; i++) {
-        doms[x].children[i].addEventListener("mousedown", function (e) {
-          selected = this;
-        })
-      }
-    }
-
-    window.addEventListener("mouseup", function (e) {
-      selected.style.animation = "bounceback 1s ease";
-      selected.style.animationFillMode = "forwards";
-      var lala = selected;
-      selected = null;
-
-      setTimeout(function () {
-        lala.style.animation = "";
-        lala.style.animationFillMode = "";
-        lala.style.left = "";
-        lala.style.top = "";
-      }, 1000)
-
-    })
-
-    window.addEventListener("mousemove", function (e) {
-      if (selected == null || !selected) return;
-      selected.style.left = (e.clientX - (selected.getBoundingClientRect().width / 2) - window.innerWidth / 2) + "px"
-      selected.style.top = (e.clientY - (selected.getBoundingClientRect().height / 2) - window.innerHeight / 2) + "px"
-      selected.style.animation = 0;
-    })
-  </script>
 </body>
 
 </html>
