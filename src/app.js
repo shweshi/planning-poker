@@ -72,6 +72,44 @@
     });
   }
 
+  function generateAvatar(backgroundColor) {
+    const text = localStorage.getItem("playerName").match(/(\b\S)?/g).join("").match(/(^\S|\S$)?/g).join("").toUpperCase();
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    foregroundColor = "#ffffff";
+
+    canvas.width = 200;
+    canvas.height = 200;
+
+    // Draw background
+    context.fillStyle = backgroundColor;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw text
+    context.font = "bold 120px Roboto";
+    context.fillStyle = foregroundColor;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    document.getElementById("avatar").src = canvas.toDataURL("image/png");
+  }
+
+  function setModeratorColor() {
+    document.getElementById("logo-text").classList.toggle('moderator');
+    document.getElementById("glowing-logo-text").classList.toggle('moderator');
+    document.getElementById("avatar").classList.toggle('moderator');
+    generateAvatar("#4DD163");
+  }
+
+  function setParticipantColor() {
+    document.getElementById("logo-text").classList.toggle('moderator');
+    document.getElementById("glowing-logo-text").classList.toggle('moderator');
+    document.getElementById("avatar").classList.toggle('moderator');
+    generateAvatar("#dc851c");
+  }
+
   const App = {
     data() {
       return {
@@ -81,6 +119,7 @@
         openDelayCounter: 0,
         playerId: "",
         playerName: "",
+        playerRole: "",
         variants: [...randomVariants(), "?"],
         vote: null,
         averageScore: 0,
@@ -90,6 +129,7 @@
     mounted() {
       let playerName = localStorage.getItem("playerName");
       let playerId = localStorage.getItem("playerId");
+      let playerRole = localStorage.getItem("playerRole");
 
       // Generating a new unique `playerId` if not defined.
       if (!playerId) {
@@ -97,27 +137,38 @@
         localStorage.setItem("playerId", playerId);
       }
       this.playerId = playerId;
+      this.playerRole = playerRole;
 
       // Asking the user to enter the player's name if it is not defined.
-      if (!playerName) {
-        playerName = "Shashi";
+      if (!playerName || !playerRole) {
+        playerName = "User";
+        playerRole = "Participant";
         let newName = prompt("Enter your name", playerName);
+
         if (newName) {
           playerName = newName;
         }
+
         localStorage.setItem("playerName", playerName);
-        generateAvatar();
+        localStorage.setItem("playerRole", playerRole);
       }
       this.playerName = playerName;
+      this.playerRole = playerRole;
 
       // Setting the default card value with no vote.
-      this.cards = [
-        {
-          playerName: this.playerName,
-          playerId: this.playerId,
-          vote: null,
-        },
-      ];
+      if (this.playerRole === 'Participant') {
+        this.cards = [
+          {
+            playerName: this.playerName,
+            playerId: this.playerId,
+            vote: null,
+          },
+        ];
+
+        generateAvatar("#dc851c");
+      } else {
+        setModeratorColor();
+      }
 
       let connect = () => {
         let schema = window.location.protocol === "https:" ? "wss" : "ws";
@@ -163,14 +214,20 @@
         this.socket.addEventListener("message", (messageEvent) => {
           let message = JSON.parse(messageEvent.data);
 
-          // If another player requested our STATE - send it.
+          // If another player requested our STATE - send it. Send only moderator's state.
           if (message.type === MESSAGE_TYPE.STATE_REQUEST) {
             this.socket.send(
               JSON.stringify({
                 type: MESSAGE_TYPE.STATE,
                 playerId: this.playerId,
                 playerName: this.playerName,
+                playerRole: this.playerRole,
                 vote: this.vote,
+                counter: this.counter,
+                isCardsOpen: this.isCardsOpen,
+                openDelayCounter: this.openDelayCounter,
+                averageScore: this.averageScore,
+                consensus: this.consensus
               })
             );
           }
@@ -201,6 +258,13 @@
                 playerId: message.playerId,
                 vote: message.vote,
               });
+            }
+
+            if (message.playerRole === 'Moderator') {
+              this.isCardsOpen = message.isCardsOpen;
+              this.openDelayCounter = this.openDelayCounter;
+              this.averageScore = this.averageScore;
+              this.consensus = this.consensus;
             }
           }
 
@@ -270,7 +334,8 @@
               })
             );
           }
-        });
+        }
+        );
       };
 
       connect();
@@ -305,6 +370,20 @@
             vote: this.vote,
           })
         );
+
+        this.playerRole === "Moderator" ? generateAvatar("#4dd163cc") : generateAvatar("#dc851c");
+      },
+
+      onRoleChange(event) {
+        if (event.target.checked) {
+          this.playerRole = "Moderator";
+          localStorage.setItem("playerRole", this.playerRole);
+          setModeratorColor();
+        } else {
+          this.playerRole = "Participant";
+          localStorage.setItem("playerRole", this.playerRole);
+          setParticipantColor();
+        }
       },
 
       onRevealCards() {
