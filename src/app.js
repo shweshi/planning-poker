@@ -18,98 +18,6 @@
     PING: "ping",
   };
 
-  function uuidv4() {
-    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
-      (
-        c ^
-        (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
-      ).toString(16)
-    );
-  }
-
-  /**
-   * Generate random variants for the cards.
-   *
-   * @returns List of variants.
-   */
-  function randomVariants() {
-    return [1, 2, 3, 5, 8, 13, 21, 34, 55];
-  }
-
-  function fireConfetti() {
-    var number = 200;
-    var defaults = {
-      origin: { y: 0.7 }
-    };
-
-    function fire(particleRatio, opts) {
-      confetti(Object.assign({}, defaults, opts, {
-        particleCount: Math.floor(number * particleRatio)
-      }));
-    }
-
-    fire(0.25, {
-      spread: 26,
-      startVelocity: 55,
-    });
-    fire(0.2, {
-      spread: 60,
-    });
-    fire(0.35, {
-      spread: 100,
-      decay: 0.91,
-      scalar: 0.8
-    });
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 25,
-      decay: 0.92,
-      scalar: 1.2
-    });
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 45,
-    });
-  }
-
-  function generateAvatar(backgroundColor) {
-    const text = localStorage.getItem("playerName").match(/(\b\S)?/g).join("").match(/(^\S|\S$)?/g).join("").toUpperCase();
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-
-    foregroundColor = "#ffffff";
-
-    canvas.width = 200;
-    canvas.height = 200;
-
-    // Draw background
-    context.fillStyle = backgroundColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw text
-    context.font = "bold 120px Roboto";
-    context.fillStyle = foregroundColor;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillText(text, canvas.width / 2, canvas.height / 2);
-
-    document.getElementById("avatar").src = canvas.toDataURL("image/png");
-  }
-
-  function setModeratorColor() {
-    document.getElementById("logo-text").classList.toggle('moderator');
-    document.getElementById("glowing-logo-text").classList.toggle('moderator');
-    document.getElementById("avatar").classList.toggle('moderator');
-    generateAvatar("#4DD163");
-  }
-
-  function setParticipantColor() {
-    document.getElementById("logo-text").classList.toggle('moderator');
-    document.getElementById("glowing-logo-text").classList.toggle('moderator');
-    document.getElementById("avatar").classList.toggle('moderator');
-    generateAvatar("#dc851c");
-  }
-
   const App = {
     data() {
       return {
@@ -155,13 +63,16 @@
       this.playerName = playerName;
       this.playerRole = playerRole;
 
+      let vote = localStorage.getItem("vote");
+      this.vote = (vote && vote.length) ? Number(vote) : null;
+
       // Setting the default card value with no vote.
       if (this.playerRole === 'Participant') {
         this.cards = [
           {
             playerName: this.playerName,
             playerId: this.playerId,
-            vote: null,
+            vote: this.vote,
           },
         ];
 
@@ -262,9 +173,9 @@
 
             if (message.playerRole === 'Moderator') {
               this.isCardsOpen = message.isCardsOpen;
-              this.openDelayCounter = this.openDelayCounter;
-              this.averageScore = this.averageScore;
-              this.consensus = this.consensus;
+              this.openDelayCounter = message.openDelayCounter;
+              this.averageScore = message.averageScore;
+              this.consensus = message.consensus;
             }
           }
 
@@ -321,6 +232,7 @@
           if (message.type === MESSAGE_TYPE.RENEW_GAME) {
             this.isCardsOpen = false;
             this.vote = null;
+            localStorage.removeItem('vote');
             this.cards.splice(1, this.cards.length);
             this.cards[0].vote = null;
             this.variants = [...randomVariants(), "?"];
@@ -344,6 +256,7 @@
     methods: {
       onVote(vote) {
         this.vote = vote;
+        localStorage.setItem("vote", this.vote);
         this.socket.send(
           JSON.stringify({
             type: MESSAGE_TYPE.STATE,
@@ -426,6 +339,98 @@
       },
     },
   };
+
+  function uuidv4() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+      (
+        c ^
+        (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+      ).toString(16)
+    );
+  }
+
+  /**
+   * Generate random variants for the cards.
+   *
+   * @returns List of variants.
+   */
+  function randomVariants() {
+    return [1, 2, 3, 5, 8, 13, 21, 34, 55];
+  }
+
+  function fireConfetti() {
+    var number = 200;
+    var defaults = {
+      origin: { y: 0.7 }
+    };
+
+    function fire(particleRatio, opts) {
+      confetti(Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(number * particleRatio)
+      }));
+    }
+
+    fire(0.25, {
+      spread: 26,
+      startVelocity: 55,
+    });
+    fire(0.2, {
+      spread: 60,
+    });
+    fire(0.35, {
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.8
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      scalar: 1.2
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 45,
+    });
+  }
+
+  function generateAvatar(backgroundColor) {
+    const text = localStorage.getItem("playerName").match(/(\b\S)?/g).join("").match(/(^\S|\S$)?/g).join("").toUpperCase();
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    foregroundColor = "#ffffff";
+
+    canvas.width = 200;
+    canvas.height = 200;
+
+    // Draw background
+    context.fillStyle = backgroundColor;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw text
+    context.font = "bold 120px Roboto";
+    context.fillStyle = foregroundColor;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    document.getElementById("avatar").src = canvas.toDataURL("image/png");
+  }
+
+  function setModeratorColor() {
+    document.getElementById("logo-text").classList.toggle('moderator');
+    document.getElementById("glowing-logo-text").classList.toggle('moderator');
+    document.getElementById("avatar").classList.toggle('moderator');
+    generateAvatar("#4DD163");
+  }
+
+  function setParticipantColor() {
+    document.getElementById("logo-text").classList.toggle('moderator');
+    document.getElementById("glowing-logo-text").classList.toggle('moderator');
+    document.getElementById("avatar").classList.toggle('moderator');
+    generateAvatar("#dc851c");
+  }
 
   // Register service worker to use the app as PWA.
   if ("serviceWorker" in navigator) {
