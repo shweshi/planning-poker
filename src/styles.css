@@ -279,6 +279,9 @@ body {
 .app__navbar_center {
   text-align: center;
   flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  padding-top: 15px;
 }
 
 .app__new-game-btn {
@@ -354,7 +357,6 @@ body {
   height: 28px;
   border-radius: 50%;
   box-shadow: 0 0 30px 0 rgb(246 147 26 / 50%);
-  border: 1.6px solid rgb(246 147 26 / 100%);
 }
 
 .cursor-pointer {
@@ -418,4 +420,85 @@ body {
 
 .logo-text {
   background-color: #dc851c;
+}
+
+.role-switch {
+  position: relative;
+  width: 100px;
+  height: 20px;
+  display: inline-block;
+}
+
+.role-switch input {
+  display: none;
+}
+
+.role-switch span {
+  position: absolute;
+  background-color: #EEEEEE;
+  border-radius: 100px;
+  box-shadow: 0 0px 50px #dc851cab;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.role-switch span::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #dc851c;
+  top: 5px;
+  left: 5px;
+  transition: .8s;
+  z-index: 999;
+}
+
+.role-switch span::after {
+  content: "Participant";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 10px;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  color: #dc851c;
+}
+
+.role-switch input:checked+span {
+  background-color: #58b299;
+  box-shadow: 0 0px 50px #58b299cc;
+}
+
+.role-switch input:checked+span::before {
+  transform: translateX(80px);
+  background-color: #fff;
+}
+
+.role-switch input:checked+span::after {
+  content: "Moderator";
+  color: white;
+}
+
+
+.app__play-table_table-button:disabled {
+  background-color: #2775ca75 !important;
+  color: #ffffff75 !important;
+  border-color: #2775ca75 !important;
+  animation: none;
+}
+
+.logo-text.moderator {
+  background-color: #58b299;
+}
+
+.glowing.moderator {
+  text-shadow: 0px 0px 0px #58b299, 0 0 50px #58b299;
+}
+
+.avatar.moderator {
+  --color: #58b299;
 }
