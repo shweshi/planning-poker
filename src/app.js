@@ -77,6 +77,7 @@
         ];
 
         generateAvatar("#dc851c");
+        showNotification("You have joined as a participant.");
       } else {
         setModeratorColor();
       }
@@ -125,7 +126,7 @@
         this.socket.addEventListener("message", (messageEvent) => {
           let message = JSON.parse(messageEvent.data);
 
-          // If another player requested our STATE - send it. Send only moderator's state.
+          // If another player requested our STATE - send it.
           if (message.type === MESSAGE_TYPE.STATE_REQUEST) {
             this.socket.send(
               JSON.stringify({
@@ -423,6 +424,7 @@
     document.getElementById("glowing-logo-text").classList.toggle('moderator');
     document.getElementById("avatar").classList.toggle('moderator');
     generateAvatar("#4DD163");
+    showNotification("You have joined as a moderator.");
   }
 
   function setParticipantColor() {
@@ -430,6 +432,15 @@
     document.getElementById("glowing-logo-text").classList.toggle('moderator');
     document.getElementById("avatar").classList.toggle('moderator');
     generateAvatar("#dc851c");
+    showNotification("You have joined as a participant.");
+  }
+
+  function showNotification(text) {
+    document.getElementById('notification').style.display = 'block';
+    document.getElementById('notification-text').innerHTML = text;
+    setTimeout(function () {
+      document.getElementById('notification').style.display = 'none';
+    }, 4000);
   }
 
   // Register service worker to use the app as PWA.
