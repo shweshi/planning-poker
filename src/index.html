@@ -38,10 +38,15 @@
           Poker</h1>
       </div>
       <div class="app__navbar_center">
-        <label for="role-switch" class="role-switch">
-          <input type="checkbox" id="role-switch" @input="onRoleChange($event)" :checked="playerRole == 'Moderator'">
-          <span></span>
-        </label>
+        <div>
+          <label for="role-switch" class="role-switch">
+            <input type="checkbox" id="role-switch" @input="onRoleChange($event)" :checked="playerRole == 'Moderator'">
+            <span></span>
+          </label>
+        </div>
+        <div class="notification" id="notification">
+          <div class="text" id="notification-text"></div>
+        </div>
       </div>
       <div class="app__navbar_right text-right cursor-pointer">
         <h2 @click="onRename()">
@@ -105,7 +110,6 @@
     <div v-if="isCardsOpen" class="app__avr-score">
       <p>Average: <span class="glowing-score">{{ averageScore }}</span></p>
     </div>
-
     <div v-if="!isCardsOpen" class="app__cards-selector">
       <ul class="app__cards-selector_list">
         <li class="app__player-card" v-for="variant in variants">
@@ -120,6 +124,14 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    window.addEventListener('offline', () => {
+      document.body.classList.toggle('offline');
+    });
+    window.addEventListener('online', () => {
+      document.body.classList.toggle('offline');
+    })
+  </script>
 </body>
 
 </html>
