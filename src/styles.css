@@ -637,7 +637,7 @@ body.offline {
   margin: 0 20px 0 0;
 }
 
-@media only screen and (max-width: 496px) {
+@media only screen and (max-width: 360px) {
   .summary-container {
     font-size: 1rem;
   }
