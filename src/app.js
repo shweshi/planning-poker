@@ -1,6 +1,7 @@
 (async () => {
-  // How many seconds wait before open cards on REVEAL message.
   const OPEN_DELAY = 3;
+  const MODERATOR_COLOR_PRIMARY = "#4DD163";
+  const PARTICIPANT_COLOR_PRIMARY = "#dc851c";
 
   // If URL doesn't contain a session id - generate a new one then redirect.
   const sessionId = window.location.pathname;
@@ -30,10 +31,16 @@
         playerRole: "",
         variants: [...randomVariants(), "?"],
         vote: null,
-        averageScore: 0,
-        consensus: 0
+        votingData: {
+          averageVote: 0,
+          highestVote: 0,
+          lowestVote: 0,
+          totalVotes: 0,
+          consensus: 0
+        },
       };
     },
+
     mounted() {
       let playerName = localStorage.getItem("playerName");
       let playerId = localStorage.getItem("playerId");
@@ -76,7 +83,7 @@
           },
         ];
 
-        generateAvatar("#dc851c");
+        generateAvatar(PARTICIPANT_COLOR_PRIMARY);
         showNotification("You have joined as a participant.");
       } else {
         setModeratorColor();
@@ -138,8 +145,7 @@
                 counter: this.counter,
                 isCardsOpen: this.isCardsOpen,
                 openDelayCounter: this.openDelayCounter,
-                averageScore: this.averageScore,
-                consensus: this.consensus
+                votingData: this.votingData
               })
             );
           }
@@ -175,8 +181,7 @@
             if (message.playerRole === 'Moderator') {
               this.isCardsOpen = message.isCardsOpen;
               this.openDelayCounter = message.openDelayCounter;
-              this.averageScore = message.averageScore;
-              this.consensus = message.consensus;
+              this.votingData = message.votingData;
             }
           }
 
@@ -194,9 +199,15 @@
 
               if (this.openDelayCounter <= 0) {
                 this.isCardsOpen = true;
-                const { averageScore, consensus } = this.calcAverageScore();
-                this.averageScore = averageScore;
-                this.consensus = consensus;
+                const { averageVote, highestVote, lowestVote, totalVotes, consensus } = this.calculateVotingData();
+
+                this.votingData = {
+                  averageVote,
+                  highestVote,
+                  lowestVote,
+                  totalVotes,
+                  consensus
+                }
 
                 if (consensus) {
                   fireConfetti();
@@ -204,22 +215,13 @@
                 // Update the voting results and calculate average.
                 // `setTimeout` is required to wait for `v-if` is ready.
                 setTimeout(() => {
-                  this.clipboard = new ClipboardJS(".app__clipboard-btn", {
-                    text: (trigger) => {
-                      let content = "";
-                      for (let card of this.cards) {
-                        let playerName = card.playerName.toLowerCase();
-                        playerName = playerName.replace(" ", ".");
-                        let vote = card.vote ?? "?";
-                        content += `* @${playerName}: ${vote}\n`;
-                      }
-
-                      content += `\n`;
-                      content += `Average: ${this.averageScore}`;
-
-                      return content;
-                    },
-                  });
+                  votemap = this.cards.reduce(function (r, a) {
+                    if (a.vote) {
+                      r[a.vote] = (r[a.vote] || 0) + 1;
+                    }
+                    return r;
+                  }, {});
+                  showVoteCloud(this.cards, this.votingData.highestVote)
                 }, 0);
 
                 clearInterval(this.openDelayInterval);
@@ -268,6 +270,19 @@
         );
       },
 
+      onClearVote() {
+        this.vote = null;
+        localStorage.setItem("vote", this.vote);
+        this.socket.send(
+          JSON.stringify({
+            type: MESSAGE_TYPE.STATE,
+            playerName: this.playerName,
+            playerId: this.playerId,
+            vote: this.vote,
+          })
+        );
+      },
+
       onRename() {
         let newName = prompt("Enter your name", this.playerName);
         if (newName) {
@@ -285,7 +300,7 @@
           })
         );
 
-        this.playerRole === "Moderator" ? generateAvatar("#4dd163cc") : generateAvatar("#dc851c");
+        this.playerRole === "Moderator" ? generateAvatar(MODERATOR_COLOR_PRIMARY) : generateAvatar(PARTICIPANT_COLOR_PRIMARY);
       },
 
       onRoleChange(event) {
@@ -318,11 +333,10 @@
         );
       },
 
-      calcAverageScore() {
+      calculateVotingData() {
         let score = 0;
         let count = 0;
-        let consensus = this.cards.every((val, i, arr) => val.vote === arr[0].vote);
-
+        let consensus = this.cards.filter(val => val.vote).every((val, i, arr) => val.vote === arr[0].vote);
         for (let idx in this.cards) {
           if (typeof this.cards[idx].vote === "number") {
             score += this.cards[idx].vote;
@@ -336,7 +350,13 @@
           consensus = true;
         }
 
-        return { averageScore: Math.round(count ? score / count : 0, 1), consensus };
+        return {
+          averageVote: Math.round(count ? score / count : 0, 1),
+          highestVote: isFinite(Math.max(...this.cards.filter(o => o.vote).map(o => o.vote))) ? Math.max(...this.cards.filter(o => o.vote).map(o => o.vote)) : 0,
+          lowestVote: isFinite(Math.min(...this.cards.filter(o => o.vote).map(o => o.vote))) ? Math.min(...this.cards.filter(o => o.vote).map(o => o.vote)) : 0,
+          totalVotes: count,
+          consensus
+        };
       },
     },
   };
@@ -423,7 +443,7 @@
     document.getElementById("logo-text").classList.toggle('moderator');
     document.getElementById("glowing-logo-text").classList.toggle('moderator');
     document.getElementById("avatar").classList.toggle('moderator');
-    generateAvatar("#4DD163");
+    generateAvatar(MODERATOR_COLOR_PRIMARY);
     showNotification("You have joined as a moderator.");
   }
 
@@ -431,7 +451,7 @@
     document.getElementById("logo-text").classList.toggle('moderator');
     document.getElementById("glowing-logo-text").classList.toggle('moderator');
     document.getElementById("avatar").classList.toggle('moderator');
-    generateAvatar("#dc851c");
+    generateAvatar(PARTICIPANT_COLOR_PRIMARY);
     showNotification("You have joined as a participant.");
   }
 
