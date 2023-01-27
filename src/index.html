@@ -28,10 +28,10 @@
 
 <body>
   <script src="https://unpkg.com/vue@next" defer></script>
-  <script src="assets/clipboard.min.js" defer></script>
   <script src="app.js" defer></script>
 
   <div v-cloak class="app__main-layout" id="app">
+
     <div class="app__navbar">
       <div class="app__navbar_left">
         <h1 class="glowing cursor-pointer" id="glowing-logo-text"><span class="logo-text" id="logo-text">P</span>lanning
@@ -56,24 +56,23 @@
       </div>
     </div>
     <div class="app__play-table">
-      <div>&nbsp;</div>
       <div class="app__play-table_top-cards">
-        <div class="app__table-card_layout" v-for="(card, index) in cards" :class="{'hidden': index % 2}">
+        <h2 class="glowing-blue-text">Available Players</h2>
+      </div>
+      <div class="app__play-table_bottom-cards">
+        <div class="app__table-card_layout"
+          v-for="(card, index) in cards.sort((a, b) => (a.playerName > b.playerName) ? 1 : -1)">
           <div :class="
-                { 
-                    'app__table-card_back': card.vote && !isCardsOpen, 
-                    'app__table-card_face': card.vote === null || isCardsOpen,
-                    'app__table-card_open': card.vote && isCardsOpen,
-                }">
+            { 
+                'app__table-card_back': card.vote && !isCardsOpen, 
+                'app__table-card_face': card.vote === null || isCardsOpen,
+                'app__table-card_open': card.vote && isCardsOpen
+            }">
             <span v-if="isCardsOpen && card.vote">{{ card.vote }}</span>
           </div>
-          <div class="app__table-card_player-name" :title="card.playerName">
-            {{ card.playerName }}
-          </div>
+          <div class="app__table-card_player-name">{{ card.playerName }}</div>
         </div>
       </div>
-      <div>&nbsp;</div>
-      <div>&nbsp;</div>
       <div class="app__play-table_table">
         <button v-if="!isCardsOpen && !openDelayCounter" class="app__play-table_table-button pulse pulse-blue"
           @click="onRevealCards()" :disabled="playerRole == 'Participant'">
@@ -90,32 +89,52 @@
           Start new voting
         </button>
       </div>
-      <div>&nbsp;</div>
-      <div>&nbsp;</div>
-      <div class="app__play-table_bottom-cards">
-        <div class="app__table-card_layout" v-for="(card, index) in cards" :class="{'hidden': index % 2 == 0}">
-          <div :class="
-            { 
-                'app__table-card_back': card.vote && !isCardsOpen, 
-                'app__table-card_face': card.vote === null || isCardsOpen,
-                'app__table-card_open': card.vote && isCardsOpen
-            }">
-            <span v-if="isCardsOpen && card.vote">{{ card.vote }}</span>
-          </div>
-          <div class="app__table-card_player-name">{{ card.playerName }}</div>
-        </div>
-      </div>
-      <div>&nbsp;</div>
     </div>
     <div v-if="isCardsOpen" class="app__avr-score">
-      <p>Average: <span class="glowing-score">{{ averageScore }}</span></p>
+      <div class="app__play-table_top-cards">
+        <h6 class="glowing-blue-text">Result</h6>
+      </div>
+
+      <div class="result-container">
+        <div class="summary-container">
+          <ul class="summary-container">
+            <li><span class="glowing" style="font-size: 2.5rem">{{ votingData.totalVotes }}</span>
+              <p>Total Votes</p>
+            </li>
+            <li><span class="glowing-blue-text" style="font-size: 2.5rem">{{ votingData.averageVote }}</span>
+              <p>Average Vote</p>
+            </li>
+            <li><span class="glowing-score" style="font-size: 2.5rem">{{ votingData.highestVote }}</span>
+              <p>Highest Vote</p>
+            </li>
+            <li><span class="glowing" style="font-size: 2.5rem">{{ votingData.lowestVote }}</span>
+              <p>Lowest Vote</p>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <ul class="players glowing-blue-text"></ul>
+        </div>
+      </div>
     </div>
-    <div v-if="!isCardsOpen" class="app__cards-selector">
+    <div v-if="!isCardsOpen && playerRole == 'Participant'" class="app__cards-selector">
+      <div class="app__play-table_top-cards">
+        <h2 class="glowing-blue-text">Select your vote</h2>
+      </div>
       <ul class="app__cards-selector_list">
         <li class="app__player-card" v-for="variant in variants">
           <button class="app__player-card_button" translate="no" @click="onVote(variant)"
             :class="{ 'app__player-card_button_selected': variant === vote }">
             <span><b>{{ variant }}</b></span>
+          </button>
+
+        </li>
+      </ul>
+      <ul class="app__cards-selector_list">
+        <li class="app__player-card">
+          <button v-if="!isCardsOpen && !openDelayCounter && playerRole == 'Participant' && vote != null"
+            class="app__player-card_button app__player-card_clear_button" translate="no" @click="onClearVote()">
+            Clear vote
           </button>
         </li>
       </ul>
@@ -131,6 +150,42 @@
     window.addEventListener('online', () => {
       document.body.classList.toggle('offline');
     })
+
+    function showVoteCloud(data, highestVote) {
+      const players = document.querySelector(".players");
+      const fragment = document.createDocumentFragment();
+      const maxFontSize = 0.5;
+
+      function handleResult(result, highestVote) {
+        const vote = result.vote;
+        const playerName = result.playerName;
+        let fontSize = vote / highestVote * maxFontSize;
+        fontSize = fontSize + 0.5;
+
+        if (fontSize <= 0.5) {
+          fontSize = 0.5;
+        } else {
+          fontSize = fontSize;
+        }
+        const fontSizeProperty = `${fontSize}em`;
+
+        player = document.createElement("li");
+        player.classList.add("player");
+        player.innerHTML = `<p class="name__link" href="" style="font-size: ${fontSizeProperty}">${playerName} (${vote})</p>`;
+
+        fragment.appendChild(player);
+      }
+
+      data.forEach((result) => {
+        if (result.vote) {
+          handleResult(result, highestVote)
+        }
+      });
+
+      if (data.length > 1) {
+        players.appendChild(fragment);
+      }
+    }
   </script>
 </body>
 
