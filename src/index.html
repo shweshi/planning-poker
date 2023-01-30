@@ -16,14 +16,15 @@
   <meta property="og:url" content="https://planning-poker.shashi.dev">
   <meta property="og:title" content="Planning Poker | Scrum Planning">
   <meta property="og:description" content="Planning poker is an online app to get consensus-based estimation.">
-  <meta property="og:image" content="">
+  <meta property="og:image" content="https://raw.githubusercontent.com/shweshi/planning-poker/main/planning-poker.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://planning-poker.shashi.dev">
   <meta property="twitter:title" content="Planning Poker | Scrum Planning">
   <meta property="twitter:description" content="Planning poker is an online app to get consensus-based estimation.">
-  <meta property="twitter:image" content="">
+  <meta property="twitter:image"
+    content="https://raw.githubusercontent.com/shweshi/planning-poker/main/planning-poker.png">
 </head>
 
 <body>
@@ -31,7 +32,6 @@
   <script src="app.js" defer></script>
 
   <div v-cloak class="app__main-layout" id="app">
-
     <div class="app__navbar">
       <div class="app__navbar_left">
         <h1 class="glowing cursor-pointer" id="glowing-logo-text"><span class="logo-text" id="logo-text">P</span>lanning
@@ -55,91 +55,100 @@
         </h2>
       </div>
     </div>
-    <div class="app__play-table">
-      <div class="app__play-table_top-cards">
-        <h2 class="glowing-blue-text">Available Players</h2>
-      </div>
-      <div class="app__play-table_bottom-cards">
-        <div class="app__table-card_layout"
-          v-for="(card, index) in cards.sort((a, b) => (a.playerName > b.playerName) ? 1 : -1)">
-          <div :class="
-            { 
-                'app__table-card_back': card.vote && !isCardsOpen, 
-                'app__table-card_face': card.vote === null || isCardsOpen,
-                'app__table-card_open': card.vote && isCardsOpen
-            }">
-            <span v-if="isCardsOpen && card.vote">{{ card.vote }}</span>
+    <div class="app_main">
+      <div class="app__play-table">
+        <div class="app__play-table_top-cards">
+          <h2 class="glowing-blue-text">Available Players</h2>
+        </div>
+        <div class="app__play-table_bottom-cards">
+          <div class="app__table-card_layout"
+            v-for="(card, index) in cards.sort((a, b) => (a.playerName > b.playerName) ? 1 : -1)">
+            <div :class="
+              { 
+                  'app__table-card_back': card.vote && !isCardsOpen, 
+                  'app__table-card_face': card.vote === null || isCardsOpen,
+                  'app__table-card_open': card.vote && isCardsOpen
+              }">
+              <span v-if="isCardsOpen && card.vote">{{ card.vote }}</span>
+            </div>
+            <div class="app__table-card_player-name">{{ card.playerName }}</div>
           </div>
-          <div class="app__table-card_player-name">{{ card.playerName }}</div>
         </div>
-      </div>
-      <div class="app__play-table_table">
-        <button v-if="!isCardsOpen && !openDelayCounter" class="app__play-table_table-button pulse pulse-blue"
-          @click="onRevealCards()" :disabled="playerRole == 'Participant'">
-          Reveal cards
-        </button>
-
-        <label v-if="!isCardsOpen && openDelayCounter" class="">
-          <button class="app__play-table_table-button pulse pulse-blue">
-            {{ openDelayCounter }}
-          </button>
-        </label>
-        <button v-if="isCardsOpen" class="app__play-table_table-button pulse pulse-blue" @click="onStartNewVoting()"
-          :disabled="playerRole == 'Participant'">
-          Start new voting
-        </button>
-      </div>
-    </div>
-    <div v-if="isCardsOpen" class="app__avr-score">
-      <div class="app__play-table_top-cards">
-        <h6 class="glowing-blue-text">Result</h6>
-      </div>
-
-      <div class="result-container">
-        <div class="summary-container">
-          <ul class="summary-container">
-            <li><span class="glowing" style="font-size: 2.5rem">{{ votingData.totalVotes }}</span>
-              <p>Total Votes</p>
-            </li>
-            <li><span class="glowing-blue-text" style="font-size: 2.5rem">{{ votingData.averageVote }}</span>
-              <p>Average Vote</p>
-            </li>
-            <li><span class="glowing-score" style="font-size: 2.5rem">{{ votingData.highestVote }}</span>
-              <p>Highest Vote</p>
-            </li>
-            <li><span class="glowing" style="font-size: 2.5rem">{{ votingData.lowestVote }}</span>
-              <p>Lowest Vote</p>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <ul class="players glowing-blue-text"></ul>
-        </div>
-      </div>
-    </div>
-    <div v-if="!isCardsOpen && playerRole == 'Participant'" class="app__cards-selector">
-      <div class="app__play-table_top-cards">
-        <h2 class="glowing-blue-text">Select your vote</h2>
-      </div>
-      <ul class="app__cards-selector_list">
-        <li class="app__player-card" v-for="variant in variants">
-          <button class="app__player-card_button" translate="no" @click="onVote(variant)"
-            :class="{ 'app__player-card_button_selected': variant === vote }">
-            <span><b>{{ variant }}</b></span>
+        <div class="app__play-table_table">
+          <button v-if="!isCardsOpen && !openDelayCounter" class="app__play-table_table-button pulse pulse-blue"
+            @click="onRevealCards()" :disabled="playerRole == 'Participant'">
+            Reveal cards
           </button>
 
-        </li>
-      </ul>
-      <ul class="app__cards-selector_list">
-        <li class="app__player-card">
-          <button v-if="!isCardsOpen && !openDelayCounter && playerRole == 'Participant' && vote != null"
-            class="app__player-card_button app__player-card_clear_button" translate="no" @click="onClearVote()">
-            Clear vote
+          <label v-if="!isCardsOpen && openDelayCounter" class="">
+            <button class="app__play-table_table-button pulse pulse-blue">
+              {{ openDelayCounter }}
+            </button>
+          </label>
+          <button v-if="isCardsOpen" class="app__play-table_table-button pulse pulse-blue" @click="onStartNewVoting()"
+            :disabled="playerRole == 'Participant'">
+            Start new voting
           </button>
-        </li>
-      </ul>
+        </div>
+      </div>
+      <div v-if="isCardsOpen" class="app__avr-score">
+        <div class="app__play-table_top-cards">
+          <h6 class="glowing-blue-text">Result</h6>
+        </div>
+
+        <div class="result-container">
+          <div class="summary-container">
+            <ul class="summary-container">
+              <li><span class="glowing" style="font-size: 2.5rem">{{ votingData.totalVotes }}</span>
+                <p>Total Votes</p>
+              </li>
+              <li><span class="glowing-blue-text" style="font-size: 2.5rem">{{ votingData.averageVote }}</span>
+                <p>Average Vote</p>
+              </li>
+              <li><span class="glowing-score" style="font-size: 2.5rem">{{ votingData.highestVote }}</span>
+                <p>Highest Vote</p>
+              </li>
+              <li><span class="glowing" style="font-size: 2.5rem">{{ votingData.lowestVote }}</span>
+                <p>Lowest Vote</p>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <ul class="players glowing-blue-text"></ul>
+          </div>
+        </div>
+      </div>
+      <div v-if="!isCardsOpen && playerRole == 'Participant'" class="app__cards-selector">
+        <div class="app__play-table_top-cards">
+          <h2 class="glowing-blue-text">Select your vote</h2>
+        </div>
+        <ul class="app__cards-selector_list">
+          <li class="app__player-card" v-for="variant in variants">
+            <button class="app__player-card_button" translate="no" @click="onVote(variant)"
+              :class="{ 'app__player-card_button_selected': variant === vote }">
+              <span><b>{{ variant }}</b></span>
+            </button>
+
+          </li>
+        </ul>
+        <ul class="app__cards-selector_list">
+          <li class="app__player-card">
+            <button v-if="!isCardsOpen && !openDelayCounter && playerRole == 'Participant' && vote != null"
+              class="app__player-card_button app__player-card_clear_button" translate="no" @click="onClearVote()">
+              Clear vote
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
     <div class="footer">
+      <a target="_" href="https://github.com/shweshi/planning-poker">
+        <svg style="filter: invert(1);" height="32" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <title>GitHub</title>
+          <path
+            d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+        </svg>
+      </a>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
