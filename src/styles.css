@@ -378,9 +378,8 @@ body.offline {
 }
 
 .footer {
-  color: #96958d;
-  text-align: right;
-  font-weight: bold;
+  height: 30px;
+  text-align: center;
 }
 
 .avatar {
@@ -637,8 +636,12 @@ body.offline {
   margin: 0 20px 0 0;
 }
 
-@media only screen and (max-width: 360px) {
+@media only screen and (max-width: 490px) {
   .summary-container {
     font-size: 1rem;
   }
+}
+
+.app_main {
+  min-height: calc(100vh - 30px);
 }
