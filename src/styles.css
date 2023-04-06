@@ -1,3 +1,16 @@
+:root {
+  --card-solid-color: #3993ff;
+  --card-background-color: #2775ca40;
+  --card-outline-color: #74b3ff;
+  --card-box-shadow-color: #2775ca;
+  --disabled-button-background-color: #2775ca75;
+  --disabled-button-border-color: #2775ca75;
+  --disabled-button-color: #ffffff75;
+  --button-background-color: #2569b4;
+  --button-border-color: #2775ca;
+  --button-color: #ffffff;
+}
+
 html,
 body {
   font-family: Roboto, Oxygen,
@@ -28,9 +41,7 @@ body.offline {
 }
 
 .app__play-table {
-  padding-top: 5rem;
-  padding-top: 5rem;
-  /* display: grid; */
+  padding-top: 3rem;
   grid-template-areas:
     "left top right"
     "left table right"
@@ -38,7 +49,7 @@ body.offline {
   grid-template-columns: 8rem 1fr 8rem;
   grid-template-rows: auto 1fr auto;
   /* max-width: 100%; */
-  min-height: 38rem;
+  min-height: auto;
   width: auto;
   justify-content: center;
   margin: auto;
@@ -58,7 +69,6 @@ body.offline {
 }
 
 .app__cards-selector {
-  padding-top: 2rem;
   height: 128px;
 }
 
@@ -69,7 +79,7 @@ body.offline {
   vertical-align: top;
   white-space: nowrap;
   box-sizing: border-box;
-  outline-color: #74b3ff;
+  outline-color: var(--card-outline-color);
 }
 
 .app__player-card:hover {
@@ -77,13 +87,13 @@ body.offline {
 }
 
 .app__player-card_button:hover {
-  background-color: #3993ff;
+  background-color: var(--card-solid-color);
   color: white;
-  box-shadow: 0 0 6px 0 rgb(39 117 202 / 125%);
+  box-shadow: 0 0 6px 0 var(--card-box-shadow-color);
 }
 
 .app__player-card_button {
-  border: 1.6px solid #3993ff;
+  border: 1.6px solid var(--card-solid-color);
   cursor: pointer;
   outline: 0;
   transition: all 0.09s linear;
@@ -91,19 +101,19 @@ body.offline {
   font-size: 19px;
   height: 8rem;
   width: 4.8rem;
-  color: #3993ff;
-  background-color: rgb(39 117 202 / 25%);
-  box-shadow: 0 0 6px 0 rgb(39 117 202 / 125%);
+  color: var(--card-solid-color);
+  background-color: var(--card-background-color);
+  box-shadow: 0 0 6px 0 var(--card-box-shadow-color);
 }
 
 .app__player-card_button_selected {
-  background-color: #3993ff;
+  background-color: var(--card-solid-color);
   color: #fff;
   margin: -0.8rem 0rem 0rem 0rem;
 }
 
 .app__player-card_button_selected:hover {
-  background-color: #3993ff;
+  background-color: var(--card-solid-color);
   color: #fff;
   margin: -0.8rem 0rem 0rem 0rem;
 }
@@ -141,10 +151,6 @@ body.offline {
   padding-bottom: 1.6rem;
 }
 
-.app__play-table_bottom-cards {
-  padding-top: 5rem;
-}
-
 .app__play-table_table-button {
   align-items: center;
   border: 0;
@@ -160,8 +166,8 @@ body.offline {
   position: relative;
   text-align: center;
   text-decoration: none;
-  border: 1.6px solid #2775ca;
-  background-color: #2569b4;
+  border: 1.6px solid var(--button-border-color);
+  background-color: var(--button-background-color);
   transition: border-color 0.2s ease 0s, background-color 0.3s ease 0s;
   color: #fffef1;
   padding: 0 2.4rem;
@@ -184,7 +190,7 @@ body.offline {
   text-decoration: none;
   transition: border-color 0.2s ease 0s, background-color 0.3s ease 0s;
   border: 0;
-  color: #3993ff;
+  color: var(--card-solid-color);
   background-color: transparent;
   padding: 0 2.4rem;
   box-shadow: 0 0 100px 0 rgb(39 117 202 / 75%);
@@ -205,12 +211,12 @@ body.offline {
   align-items: center;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  background: #3993ff;
+  background: var(--card-solid-color);
   background: linear-gradient(45deg,
-      #3993ff 12%,
+      var(--card-solid-color) 12%,
       transparent 0,
       transparent 88%,
-      #3993ff 0),
+      var(--card-solid-color) 0),
     linear-gradient(135deg,
       transparent 37%,
       #1a7bf2 0,
@@ -218,12 +224,12 @@ body.offline {
       transparent 0),
     linear-gradient(45deg,
       transparent 37%,
-      #3993ff 0,
-      #3993ff 63%,
+      var(--card-solid-color) 0,
+      var(--card-solid-color) 63%,
       transparent 0),
-    #74b3ff;
+    var(--card-outline-color);
   background-size: 17px 17px;
-  border: 1px solid #3993ff;
+  border: 1px solid var(--card-solid-color);
   border-radius: 0.6rem;
   box-shadow: 0 0 6px 0 rgb(39 117 202);
   ;
@@ -240,11 +246,11 @@ body.offline {
   flex-shrink: 0;
   height: 6rem;
   width: 3.5rem;
-  border: 1.6px solid #3993ff;
+  border: 1.6px solid var(--card-solid-color);
   line-height: 6rem;
   text-align: center;
-  color: #3993ff;
-  background-color: rgb(39 117 202 / 25%);
+  color: var(--card-solid-color);
+  background-color: var(--card-background-color);
   font-size: 1.8rem;
   font-weight: 700;
 }
@@ -321,7 +327,7 @@ body.offline {
   text-align: center;
   text-decoration: none;
   transition: all 0.09s linear;
-  background: #3993ff;
+  background: var(--card-solid-color);
   border: 0;
   color: #fff;
   padding: 0 2.4rem;
@@ -377,11 +383,6 @@ body.offline {
   top: 0px;
 }
 
-.footer {
-  height: 30px;
-  text-align: center;
-}
-
 .avatar {
   vertical-align: middle;
   width: 28px;
@@ -409,7 +410,7 @@ body.offline {
 }
 
 .pulse-blue {
-  --color: #3993ff;
+  --color: var(--card-solid-color);
   animation: pulse 1s infinite;
 }
 
@@ -521,9 +522,9 @@ body.offline {
 
 
 .app__play-table_table-button:disabled {
-  background-color: #2775ca75 !important;
-  color: #ffffff75 !important;
-  border-color: #2775ca75 !important;
+  background-color: var(--disabled-button-background-color) !important;
+  color: var(--disabled-button-color) !important;
+  border-color: var(--disabled-button-border-color) !important;
   animation: none;
 }
 
