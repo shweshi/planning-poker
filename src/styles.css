@@ -647,3 +647,20 @@ body.offline {
 .app_main {
   min-height: calc(100vh - 30px);
 }
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: var(--impact-white);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  background-color: var(--impact-white);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #606263;
+  border-radius: 10px;
+}
