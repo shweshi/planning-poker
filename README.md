@@ -1,5 +1,5 @@
 # Planning Poker
-Yet another planning poker app for quick and easy estimations.
+Yet another Planning Poker app for quick and easy story estimations.
 
 <p align="center">
   <a href="https://shweshi.github.io/planning-poker/">
@@ -10,7 +10,7 @@ Yet another planning poker app for quick and easy estimations.
 ## Features
 - Simple intuitive and modern interface
 - No login/signup required
-- No Ads
+- No Ads/ Free
 - Moderator and Participants role
 - Responsive UI allows to work on desktop, tablet and mobile
 
